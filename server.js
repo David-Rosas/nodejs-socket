@@ -1,8 +1,8 @@
 // server.js
 const http = require('http');
 const { Server } = require('socket.io');
-const { connectToDatabase } = require('./databaseConnection');
-const { crearCuenta, crearPedido} = require('./controller');
+const { connectToDatabase } = require('./database/databaseConnection');
+const { crearCuenta, crearPedido} = require('./controllers/controllerPedido');
 
 const server = http.createServer();
 const io = new Server(server);
