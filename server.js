@@ -1,48 +1,24 @@
-require("dotenv").config();
+const http = require('http');
+const { Server } = require('socket.io');
 
-const express = require("express");
-const morgan = require("morgan");
+const server = http.createServer();
+const io = new Server(server);
 
-const app = express();
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
+io.on('connection', (socket) => {
+    console.log('Usuario conectado');
 
-const port = process.env.PORT || 4001;
-const router = express.Router();
+    // Escucha eventos desde Laravel
+    socket.on('evento-laravel', (data) => {
+        console.log('Evento desde Laravel:', data);
+    });
 
-// middlewares ===========================================
-app.use(
-  cors({
-    // Sets Access-Control-Allow-Origin to the UI URI
-    origin: process.env.URL_FRONTEND,
-    // Sets Access-Control-Allow-Credentials to true
-    credentials: true,
-  })
-);
-app.use(morgan("dev"));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(express.static('./public'))
-
-// =======================================================
-
-// Rutas ==================================================
-
-const routerInit = router.get("/", function (req, res, next) {
-  res.send("EPAM- Backend");
-  res.end();
+    socket.on('disconnect', () => {
+        console.log('Usuario desconectado');
+    });
 });
 
-app.use(UserRoutes)
-app.use(TaskRoutes)
+const PORT = process.env.PORT || 3000;
 
-app.use(cookieParser());
-app.use(routerInit);
-
-// ========================================================
-
-app.listen(port, () => {
-  console.log(`Servidor WebSocket escuchando en el puerto ${PORT}`);
+server.listen(PORT, () => {
+    console.log(`Servidor WebSocket escuchando en el puerto ${PORT}`);
 });
-
-module.exports = app;
