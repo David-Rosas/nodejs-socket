@@ -2,11 +2,7 @@ const mongoose = require("mongoose");
 
 const connectToDatabase = async () => {
   try {
-    const usuario = "admin";
-    const contraseña = "6vkWvetHirjSblmh";
-    const clusterURL = "cluster0.od5p6bh.mongodb.net";
-    const nombreBaseDeDatos = "pedidos";
-const uri = `mongodb+srv://${usuario}:${contraseña}@${clusterURL}/${nombreBaseDeDatos}?retryWrites=true&w=majority`;
+    const uri = `mongodb+srv://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@${process.env.DATABASE_HOST}/${process.env.DATABASE_NAME}?retryWrites=true&w=majority`;
     await mongoose.connect(uri);
     console.log("Conexión exitosa a MongoDB Atlas");
   } catch (error) {
