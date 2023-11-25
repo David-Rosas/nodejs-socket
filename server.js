@@ -12,7 +12,7 @@ const wss = new WebSocket.Server({ server });
 app.use(
   cors({
     origin: process.env.URL_FRONTEND,
-    credentials: true,
+    credentials: false,
   })
 );
 
@@ -20,17 +20,22 @@ wss.on('connection', (socket) => {
   console.log('Usuario conectado');
 
   socket.on('message', async (data) => {
-    console.log('Mensaje desde el cliente:', data);
+    
     try {
-      // Procesar la información y emitir la respuesta a través del WebSocket
-      const nuevaCuenta = await crearCuenta(data.nombre, data.email, data.telefono);
-      const nuevoPedido = await crearPedido(nuevaCuenta._id, data.producto, data.cantidad, data.valor);
+      const dataString = data.toString('utf8');
+  
+      const parsedData = JSON.parse(dataString);
+      console.log('Mensaje desde el cliente:', parsedData);
+      // Procesar la información 
+      if(parsedData.evento == "eventPedidos"){
+      const nuevaCuenta = await crearCuenta(parsedData.pedido.cuenta.nombre, parsedData.pedido.cuenta.email, parsedData.pedido.cuenta.telefono);
+      const nuevoPedido = await crearPedido(nuevaCuenta._id, parsedData.pedido.producto, parsedData.pedido.cantidad, parsedData.pedido.valor, parsedData.pedido.total);
       const responseData = { nuevaCuenta, nuevoPedido };
 
       // Enviar la respuesta de vuelta al cliente
       socket.send(JSON.stringify(responseData));
-
-      console.log('Cuenta y pedido creados con éxito:', nuevaCuenta, nuevoPedido);
+      console.log('Cuenta y pedido creados con éxito');
+    }
     } catch (error) {
       console.error('Error al crear cuenta y pedido:', error);
     }
